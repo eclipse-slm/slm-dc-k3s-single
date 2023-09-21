@@ -1,0 +1,17 @@
+---
+- name: Converge - Undeploy
+  hosts: k3s_server
+  run_once: yes
+  gather_facts: no
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Include vars file
+      include_vars:
+        file: ./vars/main.yml
+
+    - name: Include K3s undeploy.yml
+      include_role:
+        name: use
+        tasks_from: undeploy.yml

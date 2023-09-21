@@ -1,0 +1,37 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+
+platforms:
+  - name: ubuntu1804-1
+    template_name: ubuntu-18-04
+    groups:
+      - k3s_server
+
+  - name: ubuntu1804-2
+    template_name: ubuntu-18-04
+    groups:
+      - k3s_server
+
+  - name: ubuntu1804-3
+    template_name: ubuntu-18-04
+    groups:
+      - k3s_server
+
+  - name: ubuntu1804-4
+    template_name: ubuntu-18-04
+    groups:
+      - k3s_agent
+provisioner:
+  name: ansible
+  playbooks:
+    create: ../default/create.yml
+    prepare: ../default-install/converge.yml
+    destroy: ../default/destroy.yml
+    converge: ../default-uninstall/converge.yml
+    verify: ../default-uninstall/verify.yml
+
+verifier:
+  name: ansible

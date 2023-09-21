@@ -1,0 +1,10 @@
+---
+- name: Check if uninstall script exists (server)
+  ansible.builtin.stat:
+    path: "{{ uninstall_script_server_dest }}"
+  register: uninstall_script_server
+
+- name: Run uninstall script (server)
+  ansible.builtin.shell: "{{ uninstall_script_server_dest }}"
+  register: output_uninstall_server
+  when: uninstall_script_server.stat.exists

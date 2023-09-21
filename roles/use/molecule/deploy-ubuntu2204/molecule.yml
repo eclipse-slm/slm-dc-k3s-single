@@ -1,0 +1,23 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+
+platforms:
+  - name: ubuntu2204
+    template_name: ubuntu-22-04
+    groups:
+      - k3s_server
+
+provisioner:
+  name: ansible
+  playbooks:
+    create: ../../../setup/molecule/default/create.yml
+    prepare: ../../../setup/molecule/default-install/converge.yml
+    destroy: ../../../setup/molecule/default/destroy.yml
+    converge: ../default-deploy/converge.yml
+    verify: ../default-deploy/verify.yml
+
+verifier:
+  name: ansible

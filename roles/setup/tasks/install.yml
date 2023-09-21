@@ -1,0 +1,30 @@
+---
+- name: Create cgroup memory (Raspbian only)
+  when:
+    - ansible_lsb.id is defined
+    - ansible_lsb.id == 'Raspbian'
+  include_tasks: helper/create_cgroup_memory.yml
+
+- name: Disable firewalld (CentOS only)
+  when: ansible_distribution == 'CentOS'
+  ansible.builtin.systemd:
+    state: stopped
+    name: "firewalld"
+
+- name: Include tasks for installing packages
+  include_tasks: helper/install_packages.yml
+
+- name: Include tasks file for downloading install script
+  include_tasks: helper/download_install_script.yml
+
+- name: Check if token file exists
+  ansible.builtin.stat:
+    path: /var/lib/rancher/k3s/server/node-token
+  register: token_file
+
+- name: Run install script
+  ansible.builtin.shell: "sh {{ install_script_dest }}"
+  register: output_install
+  when: not token_file.stat.exists
+  environment:
+    INSTALL_K3S_EXEC: server --cluster-init

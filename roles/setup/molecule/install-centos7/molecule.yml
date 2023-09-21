@@ -1,0 +1,42 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+
+platforms:
+  - name: centos7-1
+    template_name: centos-7
+    groups:
+      - k3s_server
+
+  - name: centos7-2
+    template_name: centos-7
+    groups:
+      - k3s_server
+
+  - name: centos7-3
+    template_name: centos-7
+    groups:
+      - k3s_server
+
+  - name: centos7-4
+    template_name: centos-7
+    groups:
+      - k3s_agent
+
+  - name: centos7-5
+    template_name: centos-7
+    groups:
+      - k3s_agent
+      - scale_up_host
+provisioner:
+  name: ansible
+  playbooks:
+    create: ../default/create.yml
+    destroy: ../default/destroy.yml
+    converge: ../default-install/converge.yml
+    verify: ../default-install/verify.yml
+
+verifier:
+  name: ansible

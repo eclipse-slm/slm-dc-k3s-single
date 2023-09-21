@@ -1,0 +1,16 @@
+---
+- name: Verify - K3s uninstall
+  hosts: k3s_server
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Get Cluster info
+      ansible.builtin.shell: "/usr/local/bin/kubectl get node"
+      failed_when: false
+      register: output_get_node
+
+    - assert:
+        that: output_get_node.rc != 0
+
+    - debug:
+        var: output_get_node.stderr

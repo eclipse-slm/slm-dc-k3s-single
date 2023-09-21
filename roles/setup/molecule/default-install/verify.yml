@@ -1,0 +1,27 @@
+---
+- name: Verify - K3s
+  hosts: k3s_server
+  gather_facts: no
+  become: yes
+  vars:
+    expected_line_count: 2
+  tasks:
+    - name: Get stat of kubectl
+      stat:
+        path: /usr/local/bin/kubectl
+      register: kubectl
+
+    - assert:
+        that: kubectl.stat.exists
+
+    - name: Get Cluster info
+      ansible.builtin.shell: "/usr/local/bin/kubectl get node"
+      register: output_get_node
+      until: output_get_node.stdout_lines | length == expected_line_count
+      retries: 10
+
+    - debug:
+        var: output_get_node.stdout_lines
+
+    - assert:
+        that: output_get_node.stdout_lines | length == expected_line_count

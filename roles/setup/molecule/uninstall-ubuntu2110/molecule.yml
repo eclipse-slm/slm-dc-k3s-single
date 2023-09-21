@@ -1,0 +1,41 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+
+platforms:
+  - name: ubuntu2110-1
+    os: ubuntu
+    version: 2110
+    groups:
+      - k3s_server
+
+  - name: ubuntu2110-2
+    os: ubuntu
+    version: 2110
+    groups:
+      - k3s_server
+
+  - name: ubuntu2110-3
+    os: ubuntu
+    version: 2110
+    groups:
+      - k3s_server
+
+  - name: ubuntu2110-4
+    os: ubuntu
+    version: 2110
+    groups:
+      - k3s_agent
+provisioner:
+  name: ansible
+  playbooks:
+    create: ../default/create.yml
+    prepare: ../default-install/converge.yml
+    destroy: ../default/destroy.yml
+    converge: ../default-uninstall/converge.yml
+    verify: ../default-uninstall/verify.yml
+
+verifier:
+  name: ansible

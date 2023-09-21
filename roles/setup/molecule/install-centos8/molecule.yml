@@ -1,0 +1,42 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: delegated
+
+platforms:
+  - name: centos8-1
+    template_name: centos-stream-8
+    groups:
+      - k3s_server
+
+  - name: centos8-2
+    template_name: centos-stream-8
+    groups:
+      - k3s_server
+
+  - name: centos8-3
+    template_name: centos-stream-8
+    groups:
+      - k3s_server
+
+  - name: centos8-4
+    template_name: centos-stream-8
+    groups:
+      - k3s_agent
+
+  - name: centos8-5
+    template_name: centos-stream-8
+    groups:
+      - k3s_agent
+      - scale_up_host
+provisioner:
+  name: ansible
+  playbooks:
+    create: ../default/create.yml
+    destroy: ../default/destroy.yml
+    converge: ../default-install/converge.yml
+    verify: ../default-install/verify.yml
+
+verifier:
+  name: ansible

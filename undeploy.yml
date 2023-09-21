@@ -1,0 +1,22 @@
+---
+- name: "Create inventory with target host(s)"
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Use inventory Helper to setup ansible inventory
+      ansible.builtin.include_role:
+        name: inventory_helper
+
+- name: Undeploy
+  hosts: all
+  run_once: yes
+  gather_facts: yes
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  tasks:
+    - name: Include K3s undeploy.yml
+      include_role:
+        name: use
+        tasks_from: undeploy.yml
