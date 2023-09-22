@@ -48,6 +48,30 @@
                   auth: "{{ ( item.username +':'+ item.password) | b64encode}}"
           with_items: "{{ docker_registries }}"
           no_log: false
+        - name: create list of configs
+          set_fact:
+            foo: |-
+              [
+              {% for item in docker_registries %}
+                {
+                  "id": "{{ item.id }}",
+                  "config": {
+                    "auths":{
+                      "{{ item.address }}":{
+                        "username":"{{ item.username }}",
+                        "password":"{{ item.password }}",
+                        "auth":"{{ (item.username +':'+ item.password) | b64encode}}" 
+                      }
+                    }
+                  }"else",
+                  "even_a_list_is_ok": [
+                      {% for gr in groups %}
+                        {{ gr }},
+                      {% endfor %}
+                  },
+              {% endfor %}
+              ]
+        
         - name: test
           set_fact:
             testvaras: "{{ (newauth2 | from_yaml | to_json) | b64encode }}"
