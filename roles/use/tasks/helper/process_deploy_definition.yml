@@ -4,18 +4,21 @@
 
 - name: block when deployment
   block:
+
     - name: debug registrys
       debug:
         msg: " {{ registry_item }}"
       loop: "{{ foo }}"
       loop_control:
         loop_var: registry_item
+
     - name: Check for private registrys
       debug:
         msg: " {{ item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length }}"
       loop: "{{ foo }}"
       loop_control:
         loop_var: registry_item
+
     - name: create secret
       kubernetes.core.k8s:
         state: present
@@ -33,8 +36,47 @@
       loop_control:
         loop_var: registry_item
       when: item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length > 0
+
+    - name: add ImagePullSecret
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        namespace: "{{ service_id }}"
+        definition:
+          apiVersion: v1
+          kind: Secret
+          type: kubernetes.io/dockerconfigjson
+          metadata:
+            name: "{{ registry_item.name }}"
+          data:
+            .dockerconfigjson: "{{ (registry_item.config | to_json) | b64encode }}"
+      loop: "{{ foo }}"
+      loop_control:
+        loop_var: registry_item
+      when: item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length > 0
+
+    - name: extract spec
+      set_fact:
+        nested_spec: item.spec.template.spec
+
+    - name: extend spec
+      set_fact:
+        nested_spec: "{{ nested_spec | combine({'ImagePullSecrets': ['aaa']}) }}"
+
+
+    - name: put back spec
+      set_fact:
+        item.spec.template.spec: "{{ nested_spec }}"
+      
+      
   when: item.kind == 'Deployment'
 
+
+
+- debug:
+    var: item
+
+    
 # - name: create creds
 #   kubernetes.core.k8s:
 #     state: present
