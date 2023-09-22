@@ -66,12 +66,13 @@
 
     - name: put back spec
       set_fact:
-        item.spec.template.spec: "{{ nested_spec }}"
+        item2: "{{ item | combine( {'spec':{'template':{nested_spec}}} , recursive=True) }}"
       
       
   when: item.kind == 'Deployment'
 
-
+- debug:
+    var: item2
 
 - debug:
     var: item
