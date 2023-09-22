@@ -5,7 +5,7 @@
 
 - name: Check for private registrys
   debug:
-    msg: " {{ item.spec.template.spec.containers | selectattr('image', 'search', registry_item) | length }}"
+    msg: " {{ item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length }}"
   loop: "{{ foo }}"
   loop_control:
     loop_var: registry_item
