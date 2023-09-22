@@ -42,7 +42,7 @@
             newauth2: |
               ---
               auths:
-                "{{ item.address}}":
+                "{{ 'cred_' + (item.address | replace('.', '-')) }}":
                   username: "{{ item.username }}"
                   password: "{{ item.password }}"
                   auth: "{{ ( item.username +':'+ item.password) | b64encode}}"
@@ -54,7 +54,7 @@
               [
               {% for item in docker_registries %}
                 {
-                  "id": "{{ item.id }}",
+                  "id": "{{ item.address  }}",
                   "config": {
                     "auths":{
                       "{{ item.address }}":{
