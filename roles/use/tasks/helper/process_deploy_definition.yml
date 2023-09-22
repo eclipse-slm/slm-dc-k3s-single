@@ -18,17 +18,17 @@
         loop_var: registry_item
     - name: create secret
       kubernetes.core.k8s:
-      state: present
-      kubeconfig: /etc/rancher/k3s/k3s.yaml
-      namespace: "{{ service_id }}"
-      definition:
-        apiVersion: v1
-        kind: Secret
-        type: kubernetes.io/dockerconfigjson
-        metadata:
-          name: "{{ registry_item.name }}"
-        data:
-          .dockerconfigjson: "{{ (registry_item.config | to_json) | b64encode }}"
+        state: present
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        namespace: "{{ service_id }}"
+        definition:
+          apiVersion: v1
+          kind: Secret
+          type: kubernetes.io/dockerconfigjson
+          metadata:
+            name: "{{ registry_item.name }}"
+          data:
+            .dockerconfigjson: "{{ (registry_item.config | to_json) | b64encode }}"
       loop: "{{ foo }}"
       loop_control:
         loop_var: registry_item
