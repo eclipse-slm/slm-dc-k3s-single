@@ -60,8 +60,10 @@
         nested_spec: "{{item.spec.template.spec}}"
 
     - name: extend spec
-      set_fact:
-        nested_spec: "{{ nested_spec | combine({'ImagePullSecrets': ['aaa']}) }}"
+      include_tasks: helper/add_docker_registry_credentials.yml
+      loop: "{{ foo }}"
+      loop_control:
+        loop_var: registry_item
 
 
     - name: put back spec
