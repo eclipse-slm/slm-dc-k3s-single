@@ -75,6 +75,7 @@
         - name: create creds
           kubernetes.core.k8s:
             state: present
+            kubeconfig: /etc/rancher/k3s/k3s.yaml
             definition:
               apiVersion: v1
               kind: Secret
