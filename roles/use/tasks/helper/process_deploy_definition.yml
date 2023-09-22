@@ -98,6 +98,6 @@
 - name: Deploy
   kubernetes.core.k8s:
     state: present
-    definition: "{{ item }}"
+    definition: "{{ item2 }}"
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     namespace: "{{ service_id }}"
