@@ -60,7 +60,7 @@
         nested_spec: "{{item.spec.template.spec}}"
 
     - name: extend spec
-      include_tasks: helper/add_docker_registry_credentials.yml
+      include_tasks: helper/add_docker_registry_credential.yml
       loop: "{{ foo }}"
       loop_control:
         loop_var: registry_item
