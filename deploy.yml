@@ -14,6 +14,8 @@
       loop: "{{ docker_registries_vault_paths|default([]) }}"
       loop_control:
         loop_var: docker_registry_vault_path
+      vars:
+        no_log: false
 
 
 - name: Deploy
@@ -27,9 +29,13 @@
     - set_fact:
         docker_registries: "{{ hostvars['localhost']['docker_registries'] }}"
       when: "(docker_registries_vault_paths is defined) and (docker_registries_vault_paths|length > 0)"
+      vars:
+        no_log: false
 
     - name: "Login to required Docker Registries"
       when: "(docker_registries is defined) and (docker_registries|length > 0)"
+      vars:
+        no_log: false
       block:
         - name: Docker Login (Linux)
           set_fact:
