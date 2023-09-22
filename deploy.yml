@@ -8,6 +8,14 @@
       ansible.builtin.include_role:
         name: inventory_helper
 
+    - include_role:
+        name: "use"
+        tasks_from: helper/get_docker_registry_credentials.yml
+      loop: "{{ docker_registries_vault_paths|default([]) }}"
+      loop_control:
+        loop_var: docker_registry_vault_path
+
+
 - name: Deploy
   hosts: all
   run_once: yes
@@ -16,6 +24,28 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
   tasks:
+    - set_fact:
+        docker_registries: "{{ hostvars['localhost']['docker_registries'] }}"
+      when: "(docker_registries_vault_paths is defined) and (docker_registries_vault_paths|length > 0)"
+
+    - name: "Login to required Docker Registries"
+      when: "(docker_registries is defined) and (docker_registries|length > 0)"
+      block:
+        - name: Docker Login (Linux)
+          set_fact:
+            newauth2: |
+              ---
+              auths:
+                "{{ item.address}}":
+                  username: "{{ item.username }}"
+                  password: "{{ item.password }}"
+                  auth: "{{ ( item.username +':'+ item.password) | b64encode}}"
+          with_items: "{{ docker_registries }}"
+          no_log: false
+        - name: test
+          set_fact:
+            testvaras: "{{ (newauth2 | from_yaml | to_json) | b64encode }}"
+
     - name: Include K3s deploy.yml
       include_role:
         name: use
