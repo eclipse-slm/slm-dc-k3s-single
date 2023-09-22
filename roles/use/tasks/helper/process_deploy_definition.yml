@@ -1,0 +1,19 @@
+
+- debug:
+    var: item
+
+
+- name: Check for private registrys
+  debug:
+    msg: " {{ item.spec.template.spec.containers | selectattr('image', 'search', registry_item) | length }}"
+  loop: "{{ foo }}"
+  loop_control:
+    loop_var: registry_item
+  when: item.kind == 'Deployment'
+
+- name: Deploy
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ item }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: "{{ service_id }}"
