@@ -77,6 +77,7 @@
             state: present
             kubeconfig: /etc/rancher/k3s/k3s.yaml
             definition:
+              namespace: "{{ service_id }}"
               apiVersion: v1
               kind: Secret
               type: kubernetes.io/dockerconfigjson
