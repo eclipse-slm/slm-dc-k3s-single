@@ -54,7 +54,7 @@
               [
               {% for item in docker_registries %}
                 {
-                  "id": "{{ 'cred_' + (item.address | replace('.', '-')) }}",
+                  "name": "{{ 'cred_' + (item.address | replace('.', '-')) }}",
                   "config": {
                     "auths":{
                       "{{ item.address }}":{
@@ -71,6 +71,19 @@
         - name: test
           set_fact:
             testvaras: "{{ (newauth2 | from_yaml | to_json) | b64encode }}"
+
+        - name: create creds
+          kubernetes.core.k8s:
+            state: present
+            definition:
+              apiVersion: v1
+              kind: Secret
+              type: kubernetes.io/dockerconfigjson
+              metadata:
+                name: "{{ item.name }}"
+              data:
+                .dockerconfigjson: "{{ (item.config | to_json) | b64encode }}"
+          with_items: "{{ foo }}"
 
     - name: Include K3s deploy.yml
       include_role:
