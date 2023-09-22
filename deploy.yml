@@ -73,20 +73,7 @@
           set_fact:
             testvaras: "{{ (newauth2 | from_yaml | to_json) | b64encode }}"
 
-        - name: create creds
-          kubernetes.core.k8s:
-            state: present
-            kubeconfig: /etc/rancher/k3s/k3s.yaml
-            namespace: "{{ service_id }}"
-            definition:
-              apiVersion: v1
-              kind: Secret
-              type: kubernetes.io/dockerconfigjson
-              metadata:
-                name: "{{ item.name }}"
-              data:
-                .dockerconfigjson: "{{ (item.config | to_json) | b64encode }}"
-          with_items: "{{ foo }}"
+
 
     - name: Include K3s deploy.yml
       include_role:
