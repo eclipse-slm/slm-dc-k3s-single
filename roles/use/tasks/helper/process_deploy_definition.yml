@@ -2,6 +2,13 @@
 - debug:
     var: item
 
+- name: debug registrys
+  debug:
+    msg: " {{ registry_item }}"
+  loop: "{{ foo }}"
+  loop_control:
+    loop_var: registry_item
+  when: item.kind == 'Deployment'
 
 - name: Check for private registrys
   debug:
