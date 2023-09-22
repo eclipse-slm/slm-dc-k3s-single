@@ -57,7 +57,7 @@
 
     - name: extract spec
       set_fact:
-        nested_spec: item.spec.template.spec
+        nested_spec: "{{item.spec.template.spec}}"
 
     - name: extend spec
       set_fact:
@@ -76,7 +76,7 @@
 - debug:
     var: item
 
-    
+
 # - name: create creds
 #   kubernetes.core.k8s:
 #     state: present
