@@ -54,7 +54,7 @@
               [
               {% for item in docker_registries %}
                 {
-                  "name": "{{ 'cred.' + (item.address | replace('.', '-')) }}",
+                  "name": "{{ 'cred-' + item.address }}",
                   "config": {
                     "auths":{
                       "{{ item.address }}":{
