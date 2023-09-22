@@ -28,9 +28,9 @@
             kind: Secret
             type: kubernetes.io/dockerconfigjson
             metadata:
-              name: "{{ item.name }}"
+              name: "{{ registry_item.name }}"
             data:
-              .dockerconfigjson: "{{ (item.config | to_json) | b64encode }}"
+              .dockerconfigjson: "{{ (registry_item.config | to_json) | b64encode }}"
           loop: "{{ foo }}"
           loop_control:
             loop_var: registry_item
