@@ -42,7 +42,7 @@
             newauth2: |
               ---
               auths:
-                "{{ 'cred_' + (item.address | replace('.', '-')) }}":
+                "{{ item.address}}":
                   username: "{{ item.username }}"
                   password: "{{ item.password }}"
                   auth: "{{ ( item.username +':'+ item.password) | b64encode}}"
@@ -54,7 +54,7 @@
               [
               {% for item in docker_registries %}
                 {
-                  "id": "{{ item.address  }}",
+                  "id": "{{ 'cred_' + (item.address | replace('.', '-')) }}",
                   "config": {
                     "auths":{
                       "{{ item.address }}":{
@@ -63,12 +63,8 @@
                         "auth":"{{ (item.username +':'+ item.password) | b64encode}}" 
                       }
                     }
-                  }"else",
-                  "even_a_list_is_ok": [
-                      {% for gr in groups %}
-                        {{ gr }},
-                      {% endfor %}
-                  },
+                  }
+                },
               {% endfor %}
               ]
         
