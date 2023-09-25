@@ -1,0 +1,48 @@
+- name: "Preserve defintion"
+  set_fact:
+    item_definition: "{{ item }}"
+
+- name: "Task block when kind of definition is deployment, and registry crednetials exist"
+  when: (item.kind == 'Deployment') and (auth_configs | default([]) | length > 0)
+  block:
+
+    - name: "Create secret(s) as for private registry in namespace of service_id '{{ service_id }}'"
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
+        namespace: "{{ service_id }}"
+        definition:
+          apiVersion: v1
+          kind: Secret
+          type: kubernetes.io/dockerconfigjson
+          metadata:
+            name: "{{ registry_item.name }}"
+          data:
+            .dockerconfigjson: "{{ (registry_item.config | to_json) | b64encode }}"
+      loop: "{{ auth_configs }}"
+      loop_control:
+        loop_var: registry_item
+      when: item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length > 0
+      no_log: "{{ no_log | default(true) }}"
+
+    - name: "Extract 'PodSpec' from deployment specification"
+      set_fact:
+        nested_spec: "{{ item.spec.template.spec }}"
+
+    - name: "Extract 'PodSpec' of deployment with 'imagePullSecret' entry(s)"
+      include_tasks: helper/add_docker_registry_credential.yml
+      loop: "{{ auth_configs }}"
+      loop_control:
+        loop_var: registry_item
+      no_log: "{{ no_log | default(true) }}"
+
+    - name: "Put back modified 'PodSpec' into deployment specification"
+      set_fact:
+        item_definition: "{{ item | combine( {'spec' : {'template' : { 'spec' : nested_spec }}} , recursive=True) }}"
+
+- name: Deploy
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ item_definition }}"
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    namespace: "{{ service_id }}"

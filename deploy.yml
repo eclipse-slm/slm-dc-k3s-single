@@ -8,7 +8,18 @@
       ansible.builtin.include_role:
         name: inventory_helper
 
-- name: Deploy
+    - name: "Get registry credentials from vault"
+      include_role:
+        name: "use"
+        tasks_from: helper/get_docker_registry_credentials.yml
+      loop: "{{ docker_registries_vault_paths|default([]) }}"
+      loop_control:
+        loop_var: docker_registry_vault_path
+      # vars:
+      #   no_log: true #uncomment and adapt to debug
+
+
+- name: "Deploy"
   hosts: all
   run_once: yes
   gather_facts: yes
@@ -16,7 +27,42 @@
   vars:
     ansible_python_interpreter: /usr/bin/python3
   tasks:
+    - set_fact:
+        docker_registries: "{{ hostvars['localhost']['docker_registries'] }}"
+      when: "(docker_registries_vault_paths is defined) and (docker_registries_vault_paths|length > 0)"
+      # vars:
+      #   no_log: true #uncomment and adapt to debug
+
+    - name: "Login to required Image Registries"
+      when: "(docker_registries is defined) and (docker_registries|length > 0)"
+      # vars:
+      #   no_log: true #uncomment and adapt to debug
+      block:
+        - name: "Create list of auth configs"
+          set_fact:
+            auth_configs: |-
+              [
+              {% for item in docker_registries %}
+                {
+                  "name": "{{ 'cred-' + item.address }}",
+                  "address": "{{ item.address }}",
+                  "config": {
+                    "auths":{
+                      "{{ item.address }}":{
+                        "username":"{{ item.username }}",
+                        "password":"{{ item.password }}",
+                        "auth":"{{ (item.username +':'+ item.password) | b64encode}}" 
+                      }
+                    }
+                  }
+                },
+              {% endfor %}
+              ]
+          no_log: "{{ no_log | default(true) }}"
+
     - name: Include K3s deploy.yml
       include_role:
         name: use
         tasks_from: deploy.yml
+      # vars:
+      #   no_log: true #uncomment and adapt to debug
