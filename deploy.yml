@@ -15,8 +15,8 @@
       loop: "{{ docker_registries_vault_paths|default([]) }}"
       loop_control:
         loop_var: docker_registry_vault_path
-      vars:
-        no_log: false
+      # vars:
+      #   no_log: true #uncomment and adapt to debug
 
 
 - name: "Deploy"
@@ -31,12 +31,12 @@
         docker_registries: "{{ hostvars['localhost']['docker_registries'] }}"
       when: "(docker_registries_vault_paths is defined) and (docker_registries_vault_paths|length > 0)"
       # vars:
-      #   no_log: false
+      #   no_log: true #uncomment and adapt to debug
 
     - name: "Login to required Image Registries"
       when: "(docker_registries is defined) and (docker_registries|length > 0)"
-      vars:
-        no_log: true
+      # vars:
+      #   no_log: true #uncomment and adapt to debug
       block:
         - name: "Create list of auth configs"
           set_fact:
@@ -64,5 +64,5 @@
       include_role:
         name: use
         tasks_from: deploy.yml
-      vars:
-        no_log: true
+      # vars:
+      #   no_log: true #uncomment and adapt to debug
