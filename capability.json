@@ -11,7 +11,7 @@
     "DEPLOY": {
       "actionClass": "AwxAction",
       "actionType": "DEPLOY",
-      "awxRepo": "https://gitlab.cc-asp.fraunhofer.de/cloud-edge-deployment/slm-dc-k3s-single",
+      "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
       "awxBranch": "main",
       "playbook": "deploy.yml",
       "connectionTypes": ["ssh"]
@@ -19,7 +19,7 @@
     "UNINSTALL": {
       "actionClass": "AwxAction",
       "actionType": "UNINSTALL",
-      "awxRepo": "https://gitlab.cc-asp.fraunhofer.de/cloud-edge-deployment/slm-dc-k3s-single",
+      "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
       "awxBranch": "main",
       "playbook": "uninstall.yml",
       "connectionTypes": ["ssh"]
@@ -27,7 +27,7 @@
     "INSTALL": {
       "actionClass": "AwxAction",
       "actionType": "INSTALL",
-      "awxRepo": "https://gitlab.cc-asp.fraunhofer.de/cloud-edge-deployment/slm-dc-k3s-single",
+      "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
       "awxBranch": "main",
       "playbook": "install.yml",
       "connectionTypes": ["ssh"]
@@ -35,7 +35,7 @@
     "UNDEPLOY": {
       "actionClass": "AwxAction",
       "actionType": "UNDEPLOY",
-      "awxRepo": "https://gitlab.cc-asp.fraunhofer.de/cloud-edge-deployment/slm-dc-k3s-single",
+      "awxRepo": "https://github.com/eclipse-slm/slm-dc-k3s-single",
       "awxBranch": "main",
       "playbook": "undeploy.yml",
       "connectionTypes": ["ssh"]
