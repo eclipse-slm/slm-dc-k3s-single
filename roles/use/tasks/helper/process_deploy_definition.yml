@@ -41,6 +41,7 @@
       loop_control:
         loop_var: registry_item
       when: item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length > 0
+      no_log: "{{ no_log | default(true) }}"
 
     # - name: add ImagePullSecret
     #   kubernetes.core.k8s:
@@ -69,19 +70,11 @@
       loop: "{{ auth_configs }}"
       loop_control:
         loop_var: registry_item
-
+      no_log: "{{ no_log | default(true) }}"
 
     - name: "Put back modified 'PodSpec' into deployment specification"
       set_fact:
         item_definition: "{{ item | combine( {'spec' : {'template' : { 'spec' : nested_spec }}} , recursive=True) }}"
-    
-
-# - debug:
-#     var: item2
-
-# - debug:
-#     var: item
-
 
 - name: Deploy
   kubernetes.core.k8s:

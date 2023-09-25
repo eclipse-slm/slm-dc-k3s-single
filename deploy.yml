@@ -36,7 +36,7 @@
     - name: "Login to required Image Registries"
       when: "(docker_registries is defined) and (docker_registries|length > 0)"
       vars:
-        no_log: false
+        no_log: true
       block:
         - name: "Create list of auth configs"
           set_fact:
@@ -64,3 +64,5 @@
       include_role:
         name: use
         tasks_from: deploy.yml
+      vars:
+        no_log: true
