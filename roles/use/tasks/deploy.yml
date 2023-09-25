@@ -7,7 +7,7 @@
     - { name: "service_id",                description: "Id of the service instance that will be deployed." }
     - { name: "manifest_file",             description: "Content of the manifest file." }
 
-- name: Create namespace
+- name: "Create namespace"
   kubernetes.core.k8s:
     name: "{{ service_id }}"
     api_version: v1
@@ -18,6 +18,6 @@
   until: not create_ns.failed
   retries: 10
 
-- name: Process every item in manifest definition
+- name: "Process every item in manifest definition"
   include_tasks: helper/process_deploy_definition.yml
   loop: "{{ manifest_file | from_yaml_all }}"

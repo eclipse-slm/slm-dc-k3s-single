@@ -8,7 +8,8 @@
       ansible.builtin.include_role:
         name: inventory_helper
 
-    - include_role:
+    - name: "Get registry credentials from vault"
+      include_role:
         name: "use"
         tasks_from: helper/get_docker_registry_credentials.yml
       loop: "{{ docker_registries_vault_paths|default([]) }}"
@@ -18,7 +19,7 @@
         no_log: false
 
 
-- name: Deploy
+- name: "Deploy"
   hosts: all
   run_once: yes
   gather_facts: yes
@@ -29,28 +30,17 @@
     - set_fact:
         docker_registries: "{{ hostvars['localhost']['docker_registries'] }}"
       when: "(docker_registries_vault_paths is defined) and (docker_registries_vault_paths|length > 0)"
-      vars:
-        no_log: false
+      # vars:
+      #   no_log: false
 
-    - name: "Login to required Docker Registries"
+    - name: "Login to required Image Registries"
       when: "(docker_registries is defined) and (docker_registries|length > 0)"
       vars:
         no_log: false
       block:
-        - name: Docker Login (Linux)
+        - name: "Create list of auth configs"
           set_fact:
-            newauth2: |
-              ---
-              auths:
-                "{{ item.address}}":
-                  username: "{{ item.username }}"
-                  password: "{{ item.password }}"
-                  auth: "{{ ( item.username +':'+ item.password) | b64encode}}"
-          with_items: "{{ docker_registries }}"
-          no_log: false
-        - name: create list of configs
-          set_fact:
-            foo: |-
+            auth_configs: |-
               [
               {% for item in docker_registries %}
                 {
@@ -68,12 +58,7 @@
                 },
               {% endfor %}
               ]
-        
-        - name: test
-          set_fact:
-            testvaras: "{{ (newauth2 | from_yaml | to_json) | b64encode }}"
-
-
+          no_log: "{{ no_log | default(true) }}"
 
     - name: Include K3s deploy.yml
       include_role:

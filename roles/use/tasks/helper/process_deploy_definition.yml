@@ -1,25 +1,30 @@
 
-- debug:
-    var: item
+# - debug:
+#     var: item
 
-- name: block when deployment
+- name: "Preserve defintion"
+  set_fact:
+    item_definition: "{{ item }}"
+
+- name: "Task block when kind of definition is deployment, and registry crednetials exist"
+  when: (item.kind == 'Deployment') and (auth_configs | default([]) | length > 0)
   block:
 
-    - name: debug registrys
-      debug:
-        msg: " {{ registry_item }}"
-      loop: "{{ foo }}"
-      loop_control:
-        loop_var: registry_item
+    # - name: debug registrys
+    #   debug:
+    #     msg: " {{ registry_item }}"
+    #   loop: "{{ auth_configs }}"
+    #   loop_control:
+    #     loop_var: registry_item
 
-    - name: Check for private registrys
-      debug:
-        msg: " {{ item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length }}"
-      loop: "{{ foo }}"
-      loop_control:
-        loop_var: registry_item
+    # - name: Check for private registrys
+    #   debug:
+    #     msg: " {{ item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length }}"
+    #   loop: "{{ auth_configs }}"
+    #   loop_control:
+    #     loop_var: registry_item
 
-    - name: create secret
+    - name: "Create secret(s) as for private registry in namespace of service_id '{{ service_id }}'"
       kubernetes.core.k8s:
         state: present
         kubeconfig: /etc/rancher/k3s/k3s.yaml
@@ -32,72 +37,55 @@
             name: "{{ registry_item.name }}"
           data:
             .dockerconfigjson: "{{ (registry_item.config | to_json) | b64encode }}"
-      loop: "{{ foo }}"
+      loop: "{{ auth_configs }}"
       loop_control:
         loop_var: registry_item
       when: item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length > 0
 
-    - name: add ImagePullSecret
-      kubernetes.core.k8s:
-        state: present
-        kubeconfig: /etc/rancher/k3s/k3s.yaml
-        namespace: "{{ service_id }}"
-        definition:
-          apiVersion: v1
-          kind: Secret
-          type: kubernetes.io/dockerconfigjson
-          metadata:
-            name: "{{ registry_item.name }}"
-          data:
-            .dockerconfigjson: "{{ (registry_item.config | to_json) | b64encode }}"
-      loop: "{{ foo }}"
-      loop_control:
-        loop_var: registry_item
-      when: item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length > 0
+    # - name: add ImagePullSecret
+    #   kubernetes.core.k8s:
+    #     state: present
+    #     kubeconfig: /etc/rancher/k3s/k3s.yaml
+    #     namespace: "{{ service_id }}"
+    #     definition:
+    #       apiVersion: v1
+    #       kind: Secret
+    #       type: kubernetes.io/dockerconfigjson
+    #       metadata:
+    #         name: "{{ registry_item.name }}"
+    #       data:
+    #         .dockerconfigjson: "{{ (registry_item.config | to_json) | b64encode }}"
+    #   loop: "{{ auth_configs }}"
+    #   loop_control:
+    #     loop_var: registry_item
+    #   when: item.spec.template.spec.containers | selectattr('image', 'search', registry_item.address) | length > 0
 
-    - name: extract spec
+    - name: "Extract 'PodSpec' from deployment specification"
       set_fact:
-        nested_spec: "{{item.spec.template.spec}}"
+        nested_spec: "{{ item.spec.template.spec }}"
 
-    - name: extend spec
+    - name: "Extract 'PodSpec' of deployment with 'imagePullSecret' entry(s)"
       include_tasks: helper/add_docker_registry_credential.yml
-      loop: "{{ foo }}"
+      loop: "{{ auth_configs }}"
       loop_control:
         loop_var: registry_item
 
 
-    - name: put back spec
+    - name: "Put back modified 'PodSpec' into deployment specification"
       set_fact:
-        item2: "{{ item | combine( {'spec' : {'template' : { 'spec' : nested_spec }}} , recursive=True) }}"
-      
-      
-  when: item.kind == 'Deployment'
+        item_definition: "{{ item | combine( {'spec' : {'template' : { 'spec' : nested_spec }}} , recursive=True) }}"
+    
 
-- debug:
-    var: item2
+# - debug:
+#     var: item2
 
-- debug:
-    var: item
+# - debug:
+#     var: item
 
-
-# - name: create creds
-#   kubernetes.core.k8s:
-#     state: present
-#     kubeconfig: /etc/rancher/k3s/k3s.yaml
-#     namespace: "{{ service_id }}"
-#     definition:
-#       apiVersion: v1
-#       kind: Secret
-#       type: kubernetes.io/dockerconfigjson
-#       metadata:
-#         name: "{{ item.name }}"
-#       data:
-#         .dockerconfigjson: "{{ (item.config | to_json) | b64encode }}"
-#   with_items: "{{ foo }}"
 
 - name: Deploy
   kubernetes.core.k8s:
     state: present
-    definition: "{{ item2 }}"
+    definition: "{{ item_definition }}"
     kubeconfig: /etc/rancher/k3s/k3s.yaml
     namespace: "{{ service_id }}"
