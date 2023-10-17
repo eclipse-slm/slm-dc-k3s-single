@@ -6,5 +6,5 @@ roles:
     name: molecule_vsphere
   - src: "git+https://github.com/eclipse-slm/slm-ansible-role-inventory-helper"
     scm: git
-    version: main
+    version: 1.0.0
     name: inventory_helper
