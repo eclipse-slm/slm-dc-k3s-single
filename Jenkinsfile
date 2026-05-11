@@ -1,6 +1,7 @@
 def default_test_list = [
 //  ["title",       "role", "action",   "scenario", "args"],
-    ["install",     "setup",  "test",   "install",   "--destroy never --report"]
+    ["install",     "setup",  "test",   "install",   "--destroy never --report"],
+    ["uninstall",     "setup",  "test",   "uninstall",   "--destroy never --report"]
     // ["deploy",      "use",  "test",     "deploy",   "--destroy never --report"],
     // ["undeploy",    "use",  "test",     "undeploy", "--destroy never --report"],
     // ["uninstall",   "use",  "cleanup",  "deploy",   "--report"]
