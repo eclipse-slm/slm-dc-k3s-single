@@ -1,10 +1,10 @@
 ---
-- name: Converge - Setup K3s Server
-  hosts: k3s_server
-  gather_facts: yes
-  become: yes
+- name: Converge - Install K3s single
+  hosts: all
+  gather_facts: true
+  become: true
   tasks:
-    - name: Include K3s setup_server.yml
-      include_role:
-        name: setup
+    - name: Include K3s setup
+      ansible.builtin.include_role:
+        name: ../../../
         tasks_from: install.yml
