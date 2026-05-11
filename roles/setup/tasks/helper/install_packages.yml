@@ -1,36 +1,55 @@
 ---
-- name: Install pip (Ubuntu)
-  when: ansible_distribution == 'Ubuntu'
+- name: Install pip (Ubuntu >= 22.04)
+  when:
+    - ansible_facts['distribution'] == 'Ubuntu'
+    - ansible_facts['distribution_version'] is version('22.04', '>=')
   ansible.builtin.apt:
-    update_cache: yes
-    pkg:
-      - python3-pip
+    name: python3-pip
+    update_cache: true
+
+- name: Install pip (Ubuntu < 22.04)
+  when:
+    - ansible_facts['distribution'] == 'Ubuntu'
+    - ansible_facts['distribution_version'] is version('22.04', '<')
+  ansible.builtin.shell: |
+    apt update
+    apt install -y python3-pip
+  register: output_install_pip
+  changed_when: "'0 upgraded, 0 newly installed' not in output_install_pip.stdout"
 
 - name: Install pip (CentOS)
-  when: ansible_distribution == 'CentOS'
+  when: ansible_facts['distribution'] == 'CentOS'
   block:
 #    - name: Install pip3 (CentOS 8)
-#      when: ansible_distribution_major_version == "8"
+#      when: ansible_facts['distribution']_major_version == "8"
 #      ansible.builtin.yum:
 #        name:
 #          - python3-pip
 
     - name: Install epel-release (CentOS 7)
-      when: ansible_distribution_major_version == "7"
+      when: ansible_facts['distribution']_major_version == "7"
       ansible.builtin.yum:
         name:
           - epel-release
 
     - name: Install pip3, setuptools
-#      when: ansible_distribution_major_version == "7"
+#      when: ansible_facts['distribution']_major_version == "7"
       ansible.builtin.yum:
         name:
           - python3-pip
           - python3-setuptools
           - python2-setuptools
 
-- name: Install pip-kubernetes
+- name: Install pip-kubernetes (Ubuntu >= 24.04)
+  when:
+    - ansible_facts['distribution'] == 'Ubuntu'
+    - ansible_facts['distribution_version'] is version('24.04', '>=')
+  ansible.builtin.apt:
+    name: python3-kubernetes
+
+- name: Install pip-kubernetes !(Ubuntu >= 24.04)
+  when:
+    - ansible_facts['distribution'] != 'Ubuntu'
+    - ansible_facts['distribution_version'] is version('24.04', '<')
   ansible.builtin.pip:
-    name:
-      - kubernetes
-    executable: pip3
+    name: kubernetes
