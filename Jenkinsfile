@@ -1,6 +1,6 @@
 def default_test_list = [
 //  ["title",       "role", "action",   "scenario", "args"],
-    ["install",     "use",  "create",   "deploy",   "--report"],
+    ["install",     "setup",  "test",   "install",   "--destroy never --report"]
     // ["deploy",      "use",  "test",     "deploy",   "--destroy never --report"],
     // ["undeploy",    "use",  "test",     "undeploy", "--destroy never --report"],
     // ["uninstall",   "use",  "cleanup",  "deploy",   "--report"]
@@ -72,7 +72,6 @@ for (kv in mapToList(scenarios)) {
     }
 }
 
-
 node {
     checkout scm
 
@@ -89,7 +88,7 @@ node {
 
 @NonCPS
 List<List<?>> mapToList(Map map) {
-    return map.collect { it ->
-        [it.key, it.value]
-    }
+  return map.collect { it ->
+    [it.key, it.value]
+  }
 }
