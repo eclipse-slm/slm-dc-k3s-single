@@ -46,7 +46,7 @@ for (kv in mapToList(scenarios)) {
             }
 
             try {
-                for(int i = 0; i < testList.size()-1; i++) {
+                for(int i = 0; i < testList.size(); i++) {
                     def title = testList[i][0]
                     def role = testList[i][1]
                     def action = testList[i][2]
