@@ -8,27 +8,13 @@ def default_test_list = [
 ]
 
 def scenarios = [
-    "ubuntu1804": default_test_list,
-    "ubuntu2004": default_test_list,
-    "ubuntu2204": default_test_list,
-    "ubuntu2404": default_test_list
-//,
-//    "centos7" : [
-//            ["setup",   "install"],
-//            ["setup",   "scaleup"],
-//            ["setup",   "scaledown"],
-//            ["use",     "deploy"],
-//            ["use",     "undeploy"],
-//            ["setup",   "uninstall"],
-//    ],
-//    "centos8" : [
-//            ["setup",   "install"],
-//            ["setup",   "scaleup"],
-//            ["setup",   "scaledown"],
-//            ["use",     "deploy"],
-//            ["use",     "undeploy"],
-//            ["setup",   "uninstall"],
-//    ]
+    "ubuntu1804":   default_test_list,
+    "ubuntu2004":   default_test_list,
+    "ubuntu2204":   default_test_list,
+    "ubuntu2404":   default_test_list,
+    "debian11":     default_test_list,
+    "debian12":     default_test_list,
+    "debian13":     default_test_list
 ]
 
 parallel_stages = [:]
