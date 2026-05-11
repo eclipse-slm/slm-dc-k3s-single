@@ -2,7 +2,7 @@
 dependency:
   name: galaxy
 driver:
-  name: delegated
+  name: default
 platforms:
   - name: ${RASPI_1_ADDRESS}
     address: ${RASPI_1_ADDRESS}
