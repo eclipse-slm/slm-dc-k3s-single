@@ -5,12 +5,6 @@
     - ansible_facts['lsb.id'] == 'Raspbian'
   ansible.builtin.include_tasks: helper/create_cgroup_memory.yml
 
-- name: Disable firewalld (CentOS only)
-  when: ansible_facts['distribution'] == 'CentOS'
-  ansible.builtin.systemd:
-    state: stopped
-    name: "firewalld"
-
 - name: Include tasks for installing packages
   ansible.builtin.include_tasks: helper/install_packages.yml
 
@@ -29,6 +23,13 @@
   ansible.builtin.set_fact:
     k3s_version: "v1.34.7+k3s1"
 
+- name: Set K3s version (CentOS < 9)
+  when:
+    - ansible_facts['distribution'] == 'CentOS'
+    - ansible_facts['distribution_version'] is version('9', '<')
+  ansible.builtin.set_fact:
+    k3s_version: "v1.34.7+k3s1"
+
 - name: Run install script
   ansible.builtin.shell: "sh {{ install_script_dest }}"
   register: output_install
@@ -36,3 +37,4 @@
   environment:
     INSTALL_K3S_EXEC: server --cluster-init
     INSTALL_K3S_VERSION: "{{ k3s_version | default('v1.36.0+k3s1') }}"
+    K3S_NODE_NAME: k3s-single-node
