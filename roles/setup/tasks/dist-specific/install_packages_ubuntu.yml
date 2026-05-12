@@ -16,7 +16,7 @@
     apt install -y python3-pip
   register: output_install_pip
   changed_when: "'0 upgraded, 0 newly installed' not in output_install_pip.stdout"
-
+  retries: 3
 
 - name: Install pip-kubernetes (Ubuntu >= 24.04)
   when:
