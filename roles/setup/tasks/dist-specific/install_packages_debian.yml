@@ -1,0 +1,21 @@
+---
+- name: Install pip (Debian)
+  when:
+    - ansible_facts['distribution'] == 'Debian'
+  ansible.builtin.apt:
+    name: python3-pip
+    update_cache: true
+
+- name: Install pip-kubernetes (Debian >= 12)
+  when:
+    - ansible_facts['distribution'] == 'Debian'
+    - ansible_facts['distribution_version'] is version('12', '>=')
+  ansible.builtin.apt:
+    name: python3-kubernetes
+
+- name: Install pip-kubernetes (Debian < 12)
+  when:
+    - ansible_facts['distribution'] == 'Debian'
+    - ansible_facts['distribution_version'] is version('12', '<')
+  ansible.builtin.pip:
+    name: kubernetes

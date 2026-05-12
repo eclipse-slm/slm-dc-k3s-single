@@ -1,76 +1,12 @@
 ---
-- name: Install pip (Ubuntu >= 22.04)
-  when:
-    - ansible_facts['distribution'] == 'Ubuntu'
-    - ansible_facts['distribution_version'] is version('22.04', '>=')
-  ansible.builtin.apt:
-    name: python3-pip
-    update_cache: true
+- name: Install packages (Ubuntu)
+  when: ansible_facts['distribution'] == 'Ubuntu'
+  ansible.builtin.include_tasks: dist-specific/install_packages_ubuntu.yml
 
-- name: Install pip (Debian)
-  when:
-    - ansible_facts['distribution'] == 'Debian'
-  ansible.builtin.apt:
-    name: python3-pip
-    update_cache: true
+- name: Install packages (Debian)
+  when: ansible_facts['distribution'] == 'Debian'
+  ansible.builtin.include_tasks: dist-specific/install_packages_debian.yml
 
-- name: Install pip (Ubuntu < 22.04)
-  when:
-    - ansible_facts['distribution'] == 'Ubuntu'
-    - ansible_facts['distribution_version'] is version('22.04', '<')
-  ansible.builtin.shell: |
-    apt update
-    apt install -y python3-pip
-  register: output_install_pip
-  changed_when: "'0 upgraded, 0 newly installed' not in output_install_pip.stdout"
-
-- name: Install pip (CentOS)
+- name: Install packages (CentOS)
   when: ansible_facts['distribution'] == 'CentOS'
-  block:
-#    - name: Install pip3 (CentOS 8)
-#      when: ansible_facts['distribution']_major_version == "8"
-#      ansible.builtin.yum:
-#        name:
-#          - python3-pip
-
-    - name: Install epel-release (CentOS 7)
-      when: ansible_facts['distribution']_major_version == "7"
-      ansible.builtin.yum:
-        name:
-          - epel-release
-
-    - name: Install pip3, setuptools
-#      when: ansible_facts['distribution']_major_version == "7"
-      ansible.builtin.yum:
-        name:
-          - python3-pip
-          - python3-setuptools
-          - python2-setuptools
-
-- name: Install pip-kubernetes (Ubuntu >= 24.04)
-  when:
-    - ansible_facts['distribution'] == 'Ubuntu'
-    - ansible_facts['distribution_version'] is version('24.04', '>=')
-  ansible.builtin.apt:
-    name: python3-kubernetes
-
-- name: Install pip-kubernetes (Ubuntu < 24.04)
-  when:
-    - ansible_facts['distribution'] == 'Ubuntu'
-    - ansible_facts['distribution_version'] is version('24.04', '<')
-  ansible.builtin.pip:
-    name: kubernetes
-
-- name: Install pip-kubernetes (Debian >= 12)
-  when:
-    - ansible_facts['distribution'] == 'Debian'
-    - ansible_facts['distribution_version'] is version('12', '>=')
-  ansible.builtin.apt:
-    name: python3-kubernetes
-
-- name: Install pip-kubernetes (Debian < 12)
-  when:
-    - ansible_facts['distribution'] == 'Debian'
-    - ansible_facts['distribution_version'] is version('12', '<')
-  ansible.builtin.pip:
-    name: kubernetes
+  ansible.builtin.include_tasks: dist-specific/install_packages_centos.yml

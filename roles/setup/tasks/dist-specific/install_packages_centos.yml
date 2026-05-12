@@ -1,0 +1,17 @@
+---
+# - name: Install epel-release (CentOS 7)
+#   when: ansible_facts['distribution_version'] is version('7', '==')
+#   ansible.builtin.yum:
+#     name:
+#       - epel-release
+
+- name: Install pip3, setuptools (CentOS >= 9)
+  when: ansible_facts['distribution_version'] is version('9', '>=')
+  ansible.builtin.dnf:
+    name:
+      - python3-pip
+      - python3-setuptools
+
+- name: Install pip-kubernetes
+  ansible.builtin.pip:
+    name: kubernetes
