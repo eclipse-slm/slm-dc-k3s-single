@@ -35,6 +35,6 @@
   register: output_install
   when: not token_file.stat.exists
   environment:
-    INSTALL_K3S_EXEC: server --cluster-init
+    INSTALL_K3S_EXEC: "server --cluster-init --node-external-ip {{ ansible_host }} {{ k3s_exec | default('') }}"
     INSTALL_K3S_VERSION: "{{ k3s_version | default('v1.36.0+k3s1') }}"
     K3S_NODE_NAME: k3s-single-node
