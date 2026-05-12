@@ -9,8 +9,8 @@ dependency:
     requirements-file: requirements.yml
 
 platforms:
-  - name: centos8
-    image_name: CentOS 8 64-bit (Ansible)
+  - name: centos10
+    image_name: CentOS 10 Stream 64-bit
 
 ansible:
   cfg:
@@ -36,9 +36,10 @@ ansible:
 
   playbooks:
     create: ../default/create.yml
-    converge: ../default-install/converge.yml
+    prepare: ../default-install/converge.yml
     destroy: ../default/destroy.yml
-    verify: ../default-install/verify.yml
+    converge: ../default-uninstall/converge.yml
+    verify: ../default-uninstall/verify.yml
 
 scenario:
   test_sequence:
